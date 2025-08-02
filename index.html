@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Devak Shah">
+
+<title>STAT468 Final Project</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="final_project_files/libs/clipboard/clipboard.min.js"></script>
+<script src="final_project_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="final_project_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="final_project_files/libs/quarto-html/popper.min.js"></script>
+<script src="final_project_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="final_project_files/libs/quarto-html/anchor.min.js"></script>
+<link href="final_project_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="final_project_files/libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="final_project_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="final_project_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="final_project_files/libs/bootstrap/bootstrap-81267100e462c21b3d6c0d5bf76a3417.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+  
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">STAT468 Final Project</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Devak Shah </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div id="d21528c2" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> TopDownHockey_Scraper.TopDownHockey_NHL_Scraper <span class="im">as</span> tdhnhlscrape</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> TopDownHockey_Scraper.TopDownHockey_EliteProspects_Scraper <span class="im">as</span> tdhepscrape</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nhlpy <span class="im">import</span> NHLClient</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="9a81a013" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="4b0a2b85" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get OHL Player Data (stats, build, etc)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Can't include all years because of backend data issues in some years</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#years = ["2004-2005", "2006-2007", "2007-2008", "2008-2009", "2009-2010", "2010-2011", "2011-2012", "2012-2013", "2013-2014", </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#         "2014-2015", "2015-2016", "2016-2017", "2017-2018", "2018-2019"]</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> [<span class="st">"2016-2017"</span>, <span class="st">"2013-2014"</span>]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>aggregated_output <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> years:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> tdhepscrape.get_skaters((<span class="st">"ohl"</span>), (year))[<span class="dv">0</span>:<span class="dv">10</span>]</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#GET PLAYER INFO</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> tdhepscrape.get_player_information(df)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">#GET RID OF D-MEN</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df[<span class="op">~</span>df[<span class="st">'player'</span>].<span class="bu">str</span>.contains(<span class="vs">r'</span><span class="ch">\(</span><span class="kw">(</span><span class="pp">[^)]</span><span class="op">*</span><span class="vs">D</span><span class="pp">[^)]</span><span class="op">*</span><span class="kw">)</span><span class="ch">\)</span><span class="vs">'</span>, regex<span class="op">=</span><span class="va">True</span>)]</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">#GET RID OF PLAYER POSITIONS FROM NAMES</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'player'</span>] <span class="op">=</span> df[<span class="st">'player'</span>].<span class="bu">str</span>.replace(<span class="vs">r'</span><span class="dv">\s</span><span class="op">*</span><span class="ch">\(</span><span class="pp">[^)]</span><span class="op">*</span><span class="ch">\)</span><span class="vs">'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">#ADD YEAR TO DF</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    df.insert(<span class="dv">0</span>, <span class="st">"year"</span>, year)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">#JOIN PLAYER BIO WITH STATS</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    year_output <span class="op">=</span> pd.merge(df[[<span class="st">"year"</span>, <span class="st">"player"</span>, <span class="st">"gp"</span>, <span class="st">"g"</span>, <span class="st">"a"</span>, <span class="st">"tp"</span>]], info[[<span class="st">"player"</span>, <span class="st">"dob"</span>, <span class="st">"height"</span>, <span class="st">"weight"</span>, <span class="st">"shoots"</span>]], on<span class="op">=</span><span class="st">'player'</span>, how<span class="op">=</span><span class="st">'inner'</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">#ADD CURRENT YEAR PROSPECTS TO AGGREGATED DF</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    aggregated_output <span class="op">=</span> pd.concat([aggregated_output, year_output])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Your scrape request is skater data from the following league:
+ohl
+In the following season:
+2016-2017
+Beginning scrape of ohl skater data from 2016-2017.
+Successfully scraped all ohl skater data from 2016-2017.
+Scraping ohl data is complete. You scraped skater data from 2016-2017.
+Completed scraping skater data from the following league:
+ohl
+Over the following season:
+2016-2017
+Beginning scrape for 10 players.
+Ryan Moore scraped! That's 1 down! Only 9 left to go!
+Cliff Pu scraped! That's 2 down! Only 8 left to go!
+Taylor Raddysh scraped! That's 3 down! Only 7 left to go!
+Adam Mascherin scraped! That's 4 down! Only 6 left to go!
+Nick Suzuki scraped! That's 5 down! Only 5 left to go!
+Petrus Palmu scraped! That's 6 down! Only 4 left to go!
+Kole Sherwood scraped! That's 7 down! Only 3 left to go!
+Alex DeBrincat scraped! That's 8 down! Only 2 left to go!
+Jordan Kyrou scraped! That's 9 down! Only 1 left to go!
+Kevin Hancock scraped! That's 10 down! Only 0 left to go!
+Your scrape is complete! You've obtained player information for 10 players!
+Your scrape request is skater data from the following league:
+ohl
+In the following season:
+2013-2014
+Beginning scrape of ohl skater data from 2013-2014.
+Successfully scraped all ohl skater data from 2013-2014.
+Scraping ohl data is complete. You scraped skater data from 2013-2014.
+Completed scraping skater data from the following league:
+ohl
+Over the following season:
+2013-2014
+Beginning scrape for 10 players.
+Connor McDavid scraped! That's 1 down! Only 9 left to go!
+Michael Dal Colle scraped! That's 2 down! Only 8 left to go!
+Dane Fox scraped! That's 3 down! Only 7 left to go!
+Sam Bennett scraped! That's 4 down! Only 6 left to go!
+Max Domi scraped! That's 5 down! Only 5 left to go!
+Connor Brown scraped! That's 6 down! Only 4 left to go!
+Andreas Athanasiou scraped! That's 7 down! Only 3 left to go!
+Sergei Tolchinsky scraped! That's 8 down! Only 2 left to go!
+Scott Kosmachuk scraped! That's 9 down! Only 1 left to go!
+Nikolai Goldobin scraped! That's 10 down! Only 0 left to go!
+Your scrape is complete! You've obtained player information for 10 players!</code></pre>
+</div>
+</div>
+<div id="7c666eca" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Changing types of all columns, they are objects by default</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"gp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"gp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"gp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"gp"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"g"</span>] <span class="op">=</span> aggregated_output[<span class="st">"g"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"g"</span>] <span class="op">=</span> aggregated_output[<span class="st">"g"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"a"</span>] <span class="op">=</span> aggregated_output[<span class="st">"a"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"a"</span>] <span class="op">=</span> aggregated_output[<span class="st">"a"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"tp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"tp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"tp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"tp"</span>].astype(<span class="bu">int</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8f678995" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get corresponding draft year for every season (oe. 2024-2025 would have a draft year of 2025)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># note this isn't necessarily the players' draft year - it's just the draft year for the corresponding row's season</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"draft_year"</span>] <span class="op">=</span> aggregated_output[<span class="st">"year"</span>].<span class="bu">str</span>[<span class="dv">5</span>:]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"draft_year"</span>] <span class="op">=</span> aggregated_output[<span class="st">"draft_year"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>aggregated_output</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">year</th>
+<th data-quarto-table-cell-role="th">player</th>
+<th data-quarto-table-cell-role="th">gp</th>
+<th data-quarto-table-cell-role="th">g</th>
+<th data-quarto-table-cell-role="th">a</th>
+<th data-quarto-table-cell-role="th">tp</th>
+<th data-quarto-table-cell-role="th">dob</th>
+<th data-quarto-table-cell-role="th">height</th>
+<th data-quarto-table-cell-role="th">weight</th>
+<th data-quarto-table-cell-role="th">shoots</th>
+<th data-quarto-table-cell-role="th">draft_year</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2016-2017</td>
+<td>Alex DeBrincat</td>
+<td>63</td>
+<td>65</td>
+<td>62</td>
+<td>127</td>
+<td>1997-12-18</td>
+<td>173</td>
+<td>82 kg / 181 lbs</td>
+<td>R</td>
+<td>2017</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2016-2017</td>
+<td>Taylor Raddysh</td>
+<td>58</td>
+<td>42</td>
+<td>67</td>
+<td>109</td>
+<td>1998-02-18</td>
+<td>191</td>
+<td>90 kg / 198 lbs</td>
+<td>R</td>
+<td>2017</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2016-2017</td>
+<td>Adam Mascherin</td>
+<td>65</td>
+<td>35</td>
+<td>65</td>
+<td>100</td>
+<td>1998-06-06</td>
+<td>178</td>
+<td>93 kg / 205 lbs</td>
+<td>L</td>
+<td>2017</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2016-2017</td>
+<td>Petrus Palmu</td>
+<td>62</td>
+<td>40</td>
+<td>58</td>
+<td>98</td>
+<td>1997-07-16</td>
+<td>168</td>
+<td>78 kg / 172 lbs</td>
+<td>L</td>
+<td>2017</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2016-2017</td>
+<td>Nick Suzuki</td>
+<td>65</td>
+<td>45</td>
+<td>51</td>
+<td>96</td>
+<td>1999-08-10</td>
+<td>180</td>
+<td>94 kg / 207 lbs</td>
+<td>R</td>
+<td>2017</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>2016-2017</td>
+<td>Jordan Kyrou</td>
+<td>66</td>
+<td>30</td>
+<td>64</td>
+<td>94</td>
+<td>1998-05-05</td>
+<td>185</td>
+<td>89 kg / 196 lbs</td>
+<td>R</td>
+<td>2017</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>2016-2017</td>
+<td>Ryan Moore</td>
+<td>68</td>
+<td>39</td>
+<td>51</td>
+<td>90</td>
+<td>1997-04-09</td>
+<td>175</td>
+<td>76 kg / 168 lbs</td>
+<td>L</td>
+<td>2017</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>2016-2017</td>
+<td>Cliff Pu</td>
+<td>63</td>
+<td>35</td>
+<td>51</td>
+<td>86</td>
+<td>1998-06-03</td>
+<td>188</td>
+<td>84 kg / 185 lbs</td>
+<td>R</td>
+<td>2017</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>2016-2017</td>
+<td>Kole Sherwood</td>
+<td>60</td>
+<td>33</td>
+<td>52</td>
+<td>85</td>
+<td>1997-01-22</td>
+<td>185</td>
+<td>96 kg / 212 lbs</td>
+<td>R</td>
+<td>2017</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>2016-2017</td>
+<td>Kevin Hancock</td>
+<td>68</td>
+<td>30</td>
+<td>55</td>
+<td>85</td>
+<td>1998-03-02</td>
+<td>180</td>
+<td>82 kg / 181 lbs</td>
+<td>L</td>
+<td>2017</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2013-2014</td>
+<td>Connor Brown</td>
+<td>68</td>
+<td>45</td>
+<td>83</td>
+<td>128</td>
+<td>1994-01-14</td>
+<td>183</td>
+<td>83 kg / 183 lbs</td>
+<td>R</td>
+<td>2014</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2013-2014</td>
+<td>Dane Fox</td>
+<td>67</td>
+<td>64</td>
+<td>43</td>
+<td>107</td>
+<td>1993-10-13</td>
+<td>184</td>
+<td>84 kg / 185 lbs</td>
+<td>L</td>
+<td>2014</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2013-2014</td>
+<td>Scott Kosmachuk</td>
+<td>68</td>
+<td>49</td>
+<td>52</td>
+<td>101</td>
+<td>1994-01-24</td>
+<td>180</td>
+<td>84 kg / 185 lbs</td>
+<td>R</td>
+<td>2014</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2013-2014</td>
+<td>Connor McDavid</td>
+<td>56</td>
+<td>28</td>
+<td>71</td>
+<td>99</td>
+<td>1997-01-13</td>
+<td>185</td>
+<td>88 kg / 194 lbs</td>
+<td>L</td>
+<td>2014</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2013-2014</td>
+<td>Andreas Athanasiou</td>
+<td>66</td>
+<td>49</td>
+<td>46</td>
+<td>95</td>
+<td>1994-08-06</td>
+<td>188</td>
+<td>86 kg / 190 lbs</td>
+<td>L</td>
+<td>2014</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>2013-2014</td>
+<td>Michael Dal Colle</td>
+<td>67</td>
+<td>39</td>
+<td>56</td>
+<td>95</td>
+<td>1996-06-20</td>
+<td>191</td>
+<td>88 kg / 194 lbs</td>
+<td>L</td>
+<td>2014</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>2013-2014</td>
+<td>Nikolai Goldobin</td>
+<td>67</td>
+<td>38</td>
+<td>56</td>
+<td>94</td>
+<td>1995-10-07</td>
+<td>183</td>
+<td>82 kg / 181 lbs</td>
+<td>L</td>
+<td>2014</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>2013-2014</td>
+<td>Max Domi</td>
+<td>61</td>
+<td>34</td>
+<td>59</td>
+<td>93</td>
+<td>1995-03-02</td>
+<td>178</td>
+<td>95 kg / 209 lbs</td>
+<td>L</td>
+<td>2014</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>2013-2014</td>
+<td>Sam Bennett</td>
+<td>57</td>
+<td>36</td>
+<td>55</td>
+<td>91</td>
+<td>1996-06-20</td>
+<td>185</td>
+<td>88 kg / 194 lbs</td>
+<td>L</td>
+<td>2014</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>2013-2014</td>
+<td>Sergei Tolchinsky</td>
+<td>66</td>
+<td>31</td>
+<td>60</td>
+<td>91</td>
+<td>1995-02-03</td>
+<td>174</td>
+<td>74 kg / 163 lbs</td>
+<td>L</td>
+<td>2014</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="eadd1a6c" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting all NHL players drafted form 2005 - 2020</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">2005</span>, <span class="dv">2021</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>draftyears <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> years:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    df_list <span class="op">=</span> pd.read_html(<span class="ss">f"https://www.hockey-reference.com/draft/NHL_</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">_entry.html"</span>, match<span class="op">=</span><span class="st">"Round"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    players_drafted <span class="op">=</span> df_list[<span class="dv">0</span>]</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    players_drafted</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Let's get rid of the top header that isnt really used</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    players_drafted.columns <span class="op">=</span> players_drafted.columns.get_level_values(<span class="dv">1</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    players_drafted[<span class="st">"draft_year"</span>] <span class="op">=</span> year</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    players_drafted <span class="op">=</span> players_drafted[[<span class="st">"draft_year"</span>, <span class="st">"Player"</span>]]</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    players_drafted <span class="op">=</span>players_drafted.rename(columns<span class="op">=</span>{<span class="st">"draft_year"</span>: <span class="st">"player_draft_year"</span>, <span class="st">"Player"</span>: <span class="st">"player"</span>})</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    draftyears <span class="op">=</span> pd.concat([draftyears, players_drafted])</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>draftyears        </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_draft_year</th>
+<th data-quarto-table-cell-role="th">player</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2005</td>
+<td>Sidney Crosby</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2005</td>
+<td>Bobby Ryan</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2005</td>
+<td>Jack Johnson</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2005</td>
+<td>Benoit Pouliot</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2005</td>
+<td>Carey Price</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">223</td>
+<td>2020</td>
+<td>Ryan Tverberg</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">224</td>
+<td>2020</td>
+<td>Henrik Tikkanen</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">225</td>
+<td>2020</td>
+<td>Maxim Marushev</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">226</td>
+<td>2020</td>
+<td>Jakub Konecny</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">227</td>
+<td>2020</td>
+<td>Declan McDonnell</td>
+</tr>
+</tbody>
+</table>
+
+<p>3609 rows × 2 columns</p>
+</div>
+</div>
+</div>
+<div id="d9e64ab9" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting games played for all NHL players</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>nhl_gp <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>pages <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">80</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> page <span class="kw">in</span> pages:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    df_list <span class="op">=</span> pd.read_html(<span class="ss">f"https://www.eliteprospects.com/league/nhl/stats/all-time?page=</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    page_stats <span class="op">=</span> df_list[<span class="dv">2</span>]</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    page_stats <span class="op">=</span> page_stats[[<span class="st">"Player"</span>, <span class="st">"GP"</span>]]</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    nhl_gp <span class="op">=</span> pd.concat([nhl_gp, page_stats])</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>nhl_gp <span class="op">=</span> nhl_gp.rename(columns<span class="op">=</span>{<span class="st">"Player"</span>: <span class="st">"player"</span>, <span class="st">"GP"</span>: <span class="st">"nhl_gp"</span>})</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#GET RID OF PLAYER POSITIONS FROM NAMES</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>nhl_gp[<span class="st">'player'</span>] <span class="op">=</span> nhl_gp[<span class="st">'player'</span>].<span class="bu">str</span>.replace(<span class="vs">r'</span><span class="dv">\s</span><span class="op">*</span><span class="ch">\(</span><span class="pp">[^)]</span><span class="op">*</span><span class="ch">\)</span><span class="vs">'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Replacing NA and "-" values with 0</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>nhl_gp[<span class="st">"nhl_gp"</span>] <span class="op">=</span> nhl_gp[<span class="st">"nhl_gp"</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>nhl_gp[<span class="st">"nhl_gp"</span>] <span class="op">=</span> nhl_gp[<span class="st">"nhl_gp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>nhl_gp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="37">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player</th>
+<th data-quarto-table-cell-role="th">nhl_gp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Wayne Gretzky</td>
+<td>1487.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Jaromír Jágr</td>
+<td>1733.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Mark Messier</td>
+<td>1756.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Gordie Howe</td>
+<td>1767.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Ron Francis</td>
+<td>1731.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20</td>
+<td>Isaac Howard</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">21</td>
+<td>NaN</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22</td>
+<td>Daniil But</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23</td>
+<td>Arseni Gritsyuk</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">24</td>
+<td>David Tomasek</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+<p>8527 rows × 2 columns</p>
+</div>
+</div>
+</div>
+<div id="9329ed8d" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Join GP, draft year onto OHL player data</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#MAKE ALL PLAYER NAMES UPPERCASE (TO MAKE JOINING TABLES NON CASE SENSITIVE)</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">'player'</span>] <span class="op">=</span> aggregated_output[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>draftyears[<span class="st">'player'</span>] <span class="op">=</span> draftyears[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>nhl_gp[<span class="st">'player'</span>] <span class="op">=</span> nhl_gp[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Filter ohl stats for only drafted players' draft year stats - </span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#This will get rid of a) undrafted players, and b) drafted players non-draft year stats</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.merge(aggregated_output, draftyears, left_on<span class="op">=</span>[<span class="st">'player'</span>, <span class="st">'draft_year'</span>], right_on<span class="op">=</span>[<span class="st">'player'</span>, <span class="st">'player_draft_year'</span>], how<span class="op">=</span><span class="st">'inner'</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#Can get rid of one of the draft year columns - don't need both</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">"year"</span>, <span class="st">"player"</span>, <span class="st">"gp"</span>, <span class="st">"g"</span>, <span class="st">"a"</span>, <span class="st">"tp"</span>, <span class="st">"dob"</span>, <span class="st">"height"</span>, <span class="st">"weight"</span>, <span class="st">"shoots"</span>, <span class="st">'draft_year'</span>]]</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">#Join players' games played - if player gp not found, assume it to be 0.</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.merge(df, nhl_gp, left_on<span class="op">=</span>[<span class="st">'player'</span>], right_on<span class="op">=</span>[<span class="st">'player'</span>], how<span class="op">=</span><span class="st">'left'</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"nhl_gp"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"nhl_gp"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"regression_input2.xlsx"</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>df.to_excel(filename, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="6cce681e" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SOME DATA CLEANING</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_excel(filename)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Changing the weight to a numerical variate in kg</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"weight_kg"</span>] <span class="op">=</span> df[<span class="st">"weight"</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: x[:x.find(<span class="st">" "</span>)])</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"weight_kg"</span>] <span class="op">=</span> df[<span class="st">"weight_kg"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>df.dtypes</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting the age of the player at the time of draft (for simplicity, we will assume draft to be on June 30 for all years)</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"draft_date"</span>] <span class="op">=</span> df[<span class="st">"draft_year"</span>].astype(<span class="bu">str</span>) <span class="op">+</span> <span class="st">'-06-30'</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"draft_date"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"draft_date"</span>])</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"dob"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"dob"</span>])</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"age_days"</span>] <span class="op">=</span> (df[<span class="st">"draft_date"</span>] <span class="op">-</span> df[<span class="st">"dob"</span>])</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"age_days"</span>] <span class="op">=</span> df[<span class="st">"age_days"</span>].dt.days</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#Can get rid of intermediate columns</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop([<span class="st">"dob"</span>, <span class="st">"weight"</span>, <span class="st">"draft_year"</span>, <span class="st">"draft_date"</span>], axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Adding columns for goals/g and points/g</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"gpg"</span>] <span class="op">=</span> df[<span class="st">"g"</span>] <span class="op">/</span> df[<span class="st">"gp"</span>]</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"ppg"</span>] <span class="op">=</span> df[<span class="st">"tp"</span>] <span class="op">/</span> df[<span class="st">"gp"</span>]</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co">#Create indicator variable to measure if the player has played at least 200 nhl games</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>] <span class="op">&gt;=</span> <span class="dv">200</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Pr[GP &gt; 200]"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="co">#Renaming height column to height_cm for clarity</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.rename(columns <span class="op">=</span> {<span class="st">"height"</span>: <span class="st">"height_cm"</span>})</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="39">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">year</th>
+<th data-quarto-table-cell-role="th">player</th>
+<th data-quarto-table-cell-role="th">gp</th>
+<th data-quarto-table-cell-role="th">g</th>
+<th data-quarto-table-cell-role="th">a</th>
+<th data-quarto-table-cell-role="th">tp</th>
+<th data-quarto-table-cell-role="th">height_cm</th>
+<th data-quarto-table-cell-role="th">shoots</th>
+<th data-quarto-table-cell-role="th">nhl_gp</th>
+<th data-quarto-table-cell-role="th">weight_kg</th>
+<th data-quarto-table-cell-role="th">age_days</th>
+<th data-quarto-table-cell-role="th">gpg</th>
+<th data-quarto-table-cell-role="th">ppg</th>
+<th data-quarto-table-cell-role="th">Pr[GP &gt; 200]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2016-2017</td>
+<td>PETRUS PALMU</td>
+<td>62</td>
+<td>40</td>
+<td>58</td>
+<td>98</td>
+<td>168</td>
+<td>L</td>
+<td>0</td>
+<td>78</td>
+<td>7289</td>
+<td>0.645161</td>
+<td>1.580645</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2016-2017</td>
+<td>NICK SUZUKI</td>
+<td>65</td>
+<td>45</td>
+<td>51</td>
+<td>96</td>
+<td>180</td>
+<td>R</td>
+<td>455</td>
+<td>94</td>
+<td>6534</td>
+<td>0.692308</td>
+<td>1.476923</td>
+<td>True</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2013-2014</td>
+<td>MICHAEL DAL COLLE</td>
+<td>67</td>
+<td>39</td>
+<td>56</td>
+<td>95</td>
+<td>191</td>
+<td>L</td>
+<td>112</td>
+<td>88</td>
+<td>6584</td>
+<td>0.582090</td>
+<td>1.417910</td>
+<td>False</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="4c32458d" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># X: predictors, y: binary response</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>df_regress <span class="op">=</span> df[df[<span class="st">"year"</span>].isin([<span class="st">"2004-2005"</span>, <span class="st">"2006-2007"</span>, <span class="st">"2007-2008"</span>, <span class="st">"2008-2009"</span>, <span class="st">"2009-2010"</span>, </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"2014-2015"</span>, <span class="st">"2015-2016"</span>, <span class="st">"2016-2017"</span>, <span class="st">"2017-2018"</span>, <span class="st">"2018-2019"</span>])]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df_regress[[<span class="st">'g'</span>, <span class="st">'a'</span>, <span class="st">'tp'</span>, <span class="st">'height_cm'</span>, <span class="st">'weight_kg'</span>, <span class="st">'age_days'</span>, <span class="st">'gpg'</span>, <span class="st">'ppg'</span>]]</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(X)  <span class="co"># adds intercept</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df_regress[<span class="st">'Pr[GP &gt; 200]'</span>]</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.Logit(y, X)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> model.fit()</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.000475
+         Iterations: 35
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:           Pr[GP &gt; 200]   No. Observations:                    2
+Model:                          Logit   Df Residuals:                        0
+Method:                           MLE   Df Model:                            1
+Date:                Fri, 01 Aug 2025   Pseudo R-squ.:                  0.9993
+Time:                        20:41:14   Log-Likelihood:            -0.00095050
+converged:                      False   LL-Null:                       -1.3863
+Covariance Type:            nonrobust   LLR p-value:                   0.09600
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          0.0009   1.16e+09   8.19e-13      1.000   -2.27e+09    2.27e+09
+g              0.0834        nan        nan        nan         nan         nan
+a             -0.0090          0       -inf      0.000      -0.009      -0.009
+tp             0.0744        nan        nan        nan         nan         nan
+height_cm      0.2695   2.15e+07   1.25e-08      1.000   -4.22e+07    4.22e+07
+weight_kg      0.2204         -0       -inf      0.000       0.220       0.220
+age_days      -0.0110        nan        nan        nan         nan         nan
+gpg            0.0011        nan        nan        nan         nan         nan
+ppg            0.0005        nan        nan        nan         nan         nan
+==============================================================================</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
+  warnings.warn(msg, category=PerfectSeparationWarning)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/base/model.py:607: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
+  warnings.warn("Maximum Likelihood optimization failed to "</code></pre>
+</div>
+</div>
+<div id="9d59b91c" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Testing model out</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> df[df[<span class="st">"year"</span>].isin([<span class="st">"2010-2011"</span>, <span class="st">"2011-2012"</span>, <span class="st">"2012-2013"</span>, <span class="st">"2013-2014"</span>])]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df_test[[<span class="st">'g'</span>, <span class="st">'a'</span>, <span class="st">'tp'</span>, <span class="st">'height_cm'</span>, <span class="st">'weight_kg'</span>, <span class="st">'age_days'</span>, <span class="st">'gpg'</span>, <span class="st">'ppg'</span>]]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(X, has_constant<span class="op">=</span><span class="st">'add'</span>)  <span class="co"># adds intercept</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#If regression yields a probability greater than or equal to 0.5, we will say it predicts the player will become a full-time NHL player</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"pred_prob"</span>] <span class="op">=</span> result.predict(X) <span class="op">&gt;=</span> <span class="fl">0.5</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>df_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="41">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">year</th>
+<th data-quarto-table-cell-role="th">player</th>
+<th data-quarto-table-cell-role="th">gp</th>
+<th data-quarto-table-cell-role="th">g</th>
+<th data-quarto-table-cell-role="th">a</th>
+<th data-quarto-table-cell-role="th">tp</th>
+<th data-quarto-table-cell-role="th">height_cm</th>
+<th data-quarto-table-cell-role="th">shoots</th>
+<th data-quarto-table-cell-role="th">nhl_gp</th>
+<th data-quarto-table-cell-role="th">weight_kg</th>
+<th data-quarto-table-cell-role="th">age_days</th>
+<th data-quarto-table-cell-role="th">gpg</th>
+<th data-quarto-table-cell-role="th">ppg</th>
+<th data-quarto-table-cell-role="th">Pr[GP &gt; 200]</th>
+<th data-quarto-table-cell-role="th">pred_prob</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2013-2014</td>
+<td>MICHAEL DAL COLLE</td>
+<td>67</td>
+<td>39</td>
+<td>56</td>
+<td>95</td>
+<td>191</td>
+<td>L</td>
+<td>112</td>
+<td>88</td>
+<td>6584</td>
+<td>0.58209</td>
+<td>1.41791</td>
+<td>False</td>
+<td>True</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="bac83b07" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>TP <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">True</span>)].shape[<span class="dv">0</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"True Positive: </span><span class="sc">{</span>TP<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>TN <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">False</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">False</span>)].shape[<span class="dv">0</span>]</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"True Negative: </span><span class="sc">{</span>TN<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>FP <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">False</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">True</span>)].shape[<span class="dv">0</span>]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"False Positive: </span><span class="sc">{</span>FP<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>FN <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">False</span>)].shape[<span class="dv">0</span>]</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"False Negative: </span><span class="sc">{</span>FN<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>success_rate <span class="op">=</span> (TP <span class="op">+</span> TN) <span class="op">/</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN) <span class="cf">if</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Success Rate: </span><span class="sc">{</span>success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>positive_success_rate <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FP) <span class="cf">if</span> (TP <span class="op">+</span> FP) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Positive Success Rate: </span><span class="sc">{</span>positive_success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>nhler_success_rate <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FN) <span class="cf">if</span> (TP <span class="op">+</span> FN) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NHLer Success Rate: </span><span class="sc">{</span>nhler_success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>True Positive: 0
+True Negative: 0
+False Positive: 1
+False Negative: 0
+Success Rate: 0.00%
+Positive Success Rate: 0.00%
+NHLer Success Rate: 0.00%</code></pre>
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
