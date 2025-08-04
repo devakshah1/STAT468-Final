@@ -110,679 +110,180 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="d21528c2" class="cell" data-execution_count="1">
+<div id="d21528c2" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> TopDownHockey_Scraper.TopDownHockey_NHL_Scraper <span class="im">as</span> tdhnhlscrape</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> TopDownHockey_Scraper.TopDownHockey_EliteProspects_Scraper <span class="im">as</span> tdhepscrape</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nhlpy <span class="im">import</span> NHLClient</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="9a81a013" class="cell" data-execution_count="2">
+<div id="9a81a013" class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="94aa8e8f" class="cell">
+<div id="94aa8e8f" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Toggle to see if we want to rescrape, or just import prior scrape from existing file</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Scrape <span class="op">=</span> <span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>scrape <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"regression_input.xlsx"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="4b0a2b85" class="cell" data-execution_count="3">
+<div id="4b0a2b85" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get OHL Player Data (stats, build, etc)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Can't include all years because of backend data issues in some years</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#years = ["2004-2005", "2006-2007", "2007-2008", "2008-2009", "2009-2010", "2010-2011", "2011-2012", "2012-2013", "2013-2014", </span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#         "2014-2015", "2015-2016", "2016-2017", "2017-2018", "2018-2019"]</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> [<span class="st">"2016-2017"</span>, <span class="st">"2013-2014"</span>]</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>aggregated_output <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> years:</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> tdhepscrape.get_skaters((<span class="st">"ohl"</span>), (year))[<span class="dv">0</span>:<span class="dv">10</span>]</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#GET PLAYER INFO</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> tdhepscrape.get_player_information(df)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">#GET RID OF D-MEN</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df[<span class="op">~</span>df[<span class="st">'player'</span>].<span class="bu">str</span>.contains(<span class="vs">r'</span><span class="ch">\(</span><span class="kw">(</span><span class="pp">[^)]</span><span class="op">*</span><span class="vs">D</span><span class="pp">[^)]</span><span class="op">*</span><span class="kw">)</span><span class="ch">\)</span><span class="vs">'</span>, regex<span class="op">=</span><span class="va">True</span>)]</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">#GET RID OF PLAYER POSITIONS FROM NAMES</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'player'</span>] <span class="op">=</span> df[<span class="st">'player'</span>].<span class="bu">str</span>.replace(<span class="vs">r'</span><span class="dv">\s</span><span class="op">*</span><span class="ch">\(</span><span class="pp">[^)]</span><span class="op">*</span><span class="ch">\)</span><span class="vs">'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">#ADD YEAR TO DF</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    df.insert(<span class="dv">0</span>, <span class="st">"year"</span>, year)</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">#JOIN PLAYER BIO WITH STATS</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    year_output <span class="op">=</span> pd.merge(df[[<span class="st">"year"</span>, <span class="st">"player"</span>, <span class="st">"gp"</span>, <span class="st">"g"</span>, <span class="st">"a"</span>, <span class="st">"tp"</span>]], info[[<span class="st">"player"</span>, <span class="st">"dob"</span>, <span class="st">"height"</span>, <span class="st">"weight"</span>, <span class="st">"shoots"</span>]], on<span class="op">=</span><span class="st">'player'</span>, how<span class="op">=</span><span class="st">'inner'</span>)</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">#ADD CURRENT YEAR PROSPECTS TO AGGREGATED DF</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    aggregated_output <span class="op">=</span> pd.concat([aggregated_output, year_output])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Your scrape request is skater data from the following league:
-ohl
-In the following season:
-2016-2017
-Beginning scrape of ohl skater data from 2016-2017.
-Successfully scraped all ohl skater data from 2016-2017.
-Scraping ohl data is complete. You scraped skater data from 2016-2017.
-Completed scraping skater data from the following league:
-ohl
-Over the following season:
-2016-2017
-Beginning scrape for 10 players.
-Ryan Moore scraped! That's 1 down! Only 9 left to go!
-Cliff Pu scraped! That's 2 down! Only 8 left to go!
-Taylor Raddysh scraped! That's 3 down! Only 7 left to go!
-Adam Mascherin scraped! That's 4 down! Only 6 left to go!
-Nick Suzuki scraped! That's 5 down! Only 5 left to go!
-Petrus Palmu scraped! That's 6 down! Only 4 left to go!
-Kole Sherwood scraped! That's 7 down! Only 3 left to go!
-Alex DeBrincat scraped! That's 8 down! Only 2 left to go!
-Jordan Kyrou scraped! That's 9 down! Only 1 left to go!
-Kevin Hancock scraped! That's 10 down! Only 0 left to go!
-Your scrape is complete! You've obtained player information for 10 players!
-Your scrape request is skater data from the following league:
-ohl
-In the following season:
-2013-2014
-Beginning scrape of ohl skater data from 2013-2014.
-Successfully scraped all ohl skater data from 2013-2014.
-Scraping ohl data is complete. You scraped skater data from 2013-2014.
-Completed scraping skater data from the following league:
-ohl
-Over the following season:
-2013-2014
-Beginning scrape for 10 players.
-Connor McDavid scraped! That's 1 down! Only 9 left to go!
-Michael Dal Colle scraped! That's 2 down! Only 8 left to go!
-Dane Fox scraped! That's 3 down! Only 7 left to go!
-Sam Bennett scraped! That's 4 down! Only 6 left to go!
-Max Domi scraped! That's 5 down! Only 5 left to go!
-Connor Brown scraped! That's 6 down! Only 4 left to go!
-Andreas Athanasiou scraped! That's 7 down! Only 3 left to go!
-Sergei Tolchinsky scraped! That's 8 down! Only 2 left to go!
-Scott Kosmachuk scraped! That's 9 down! Only 1 left to go!
-Nikolai Goldobin scraped! That's 10 down! Only 0 left to go!
-Your scrape is complete! You've obtained player information for 10 players!</code></pre>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> scrape <span class="op">==</span> <span class="va">True</span>:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Can't include all years because of backend data issues in some years</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">#years = ["2004-2005", "2006-2007", "2007-2008", "2008-2009", "2009-2010", "2010-2011", "2011-2012", "2012-2013", "2013-2014", </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         "2014-2015", "2015-2016", "2016-2017", "2017-2018", "2018-2019"]</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    years <span class="op">=</span> [<span class="st">"2016-2017"</span>, <span class="st">"2013-2014"</span>]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    aggregated_output <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> year <span class="kw">in</span> years:</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> tdhepscrape.get_skaters((<span class="st">"ohl"</span>), (year))[<span class="dv">0</span>:<span class="dv">10</span>]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">#GET PLAYER INFO</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        info <span class="op">=</span> tdhepscrape.get_player_information(df)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">#GET RID OF D-MEN</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> df[<span class="op">~</span>df[<span class="st">'player'</span>].<span class="bu">str</span>.contains(<span class="vs">r'</span><span class="ch">\(</span><span class="kw">(</span><span class="pp">[^)]</span><span class="op">*</span><span class="vs">D</span><span class="pp">[^)]</span><span class="op">*</span><span class="kw">)</span><span class="ch">\)</span><span class="vs">'</span>, regex<span class="op">=</span><span class="va">True</span>)]</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        <span class="co">#GET RID OF PLAYER POSITIONS FROM NAMES</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">'player'</span>] <span class="op">=</span> df[<span class="st">'player'</span>].<span class="bu">str</span>.replace(<span class="vs">r'</span><span class="dv">\s</span><span class="op">*</span><span class="ch">\(</span><span class="pp">[^)]</span><span class="op">*</span><span class="ch">\)</span><span class="vs">'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        <span class="co">#ADD YEAR TO DF</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        df.insert(<span class="dv">0</span>, <span class="st">"year"</span>, year)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="co">#JOIN PLAYER BIO WITH STATS</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        year_output <span class="op">=</span> pd.merge(df[[<span class="st">"year"</span>, <span class="st">"player"</span>, <span class="st">"gp"</span>, <span class="st">"g"</span>, <span class="st">"a"</span>, <span class="st">"tp"</span>]], info[[<span class="st">"player"</span>, <span class="st">"dob"</span>, <span class="st">"height"</span>, <span class="st">"weight"</span>, <span class="st">"shoots"</span>]], on<span class="op">=</span><span class="st">'player'</span>, how<span class="op">=</span><span class="st">'inner'</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        <span class="co">#ADD CURRENT YEAR PROSPECTS TO AGGREGATED DF</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        aggregated_output <span class="op">=</span> pd.concat([aggregated_output, year_output])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div id="7c666eca" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Changing types of all columns, they are objects by default</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> scrape <span class="op">==</span> <span class="va">True</span>:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"gp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"gp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"gp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"gp"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"g"</span>] <span class="op">=</span> aggregated_output[<span class="st">"g"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"g"</span>] <span class="op">=</span> aggregated_output[<span class="st">"g"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"a"</span>] <span class="op">=</span> aggregated_output[<span class="st">"a"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"a"</span>] <span class="op">=</span> aggregated_output[<span class="st">"a"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"tp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"tp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"tp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"tp"</span>].astype(<span class="bu">int</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="7c666eca" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Changing types of all columns, they are objects by default</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"gp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"gp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"gp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"gp"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"g"</span>] <span class="op">=</span> aggregated_output[<span class="st">"g"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"g"</span>] <span class="op">=</span> aggregated_output[<span class="st">"g"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"a"</span>] <span class="op">=</span> aggregated_output[<span class="st">"a"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"a"</span>] <span class="op">=</span> aggregated_output[<span class="st">"a"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"tp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"tp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"tp"</span>] <span class="op">=</span> aggregated_output[<span class="st">"tp"</span>].astype(<span class="bu">int</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8f678995" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get corresponding draft year for every season (oe. 2024-2025 would have a draft year of 2025)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># note this isn't necessarily the players' draft year - it's just the draft year for the corresponding row's season</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> scrape <span class="op">==</span> <span class="va">True</span>:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"draft_year"</span>] <span class="op">=</span> aggregated_output[<span class="st">"year"</span>].<span class="bu">str</span>[<span class="dv">5</span>:]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">"draft_year"</span>] <span class="op">=</span> aggregated_output[<span class="st">"draft_year"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    aggregated_output</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="8f678995" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get corresponding draft year for every season (oe. 2024-2025 would have a draft year of 2025)</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># note this isn't necessarily the players' draft year - it's just the draft year for the corresponding row's season</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"draft_year"</span>] <span class="op">=</span> aggregated_output[<span class="st">"year"</span>].<span class="bu">str</span>[<span class="dv">5</span>:]</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">"draft_year"</span>] <span class="op">=</span> aggregated_output[<span class="st">"draft_year"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>aggregated_output</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="35">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">year</th>
-<th data-quarto-table-cell-role="th">player</th>
-<th data-quarto-table-cell-role="th">gp</th>
-<th data-quarto-table-cell-role="th">g</th>
-<th data-quarto-table-cell-role="th">a</th>
-<th data-quarto-table-cell-role="th">tp</th>
-<th data-quarto-table-cell-role="th">dob</th>
-<th data-quarto-table-cell-role="th">height</th>
-<th data-quarto-table-cell-role="th">weight</th>
-<th data-quarto-table-cell-role="th">shoots</th>
-<th data-quarto-table-cell-role="th">draft_year</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>2016-2017</td>
-<td>Alex DeBrincat</td>
-<td>63</td>
-<td>65</td>
-<td>62</td>
-<td>127</td>
-<td>1997-12-18</td>
-<td>173</td>
-<td>82 kg / 181 lbs</td>
-<td>R</td>
-<td>2017</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2016-2017</td>
-<td>Taylor Raddysh</td>
-<td>58</td>
-<td>42</td>
-<td>67</td>
-<td>109</td>
-<td>1998-02-18</td>
-<td>191</td>
-<td>90 kg / 198 lbs</td>
-<td>R</td>
-<td>2017</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2016-2017</td>
-<td>Adam Mascherin</td>
-<td>65</td>
-<td>35</td>
-<td>65</td>
-<td>100</td>
-<td>1998-06-06</td>
-<td>178</td>
-<td>93 kg / 205 lbs</td>
-<td>L</td>
-<td>2017</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>2016-2017</td>
-<td>Petrus Palmu</td>
-<td>62</td>
-<td>40</td>
-<td>58</td>
-<td>98</td>
-<td>1997-07-16</td>
-<td>168</td>
-<td>78 kg / 172 lbs</td>
-<td>L</td>
-<td>2017</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2016-2017</td>
-<td>Nick Suzuki</td>
-<td>65</td>
-<td>45</td>
-<td>51</td>
-<td>96</td>
-<td>1999-08-10</td>
-<td>180</td>
-<td>94 kg / 207 lbs</td>
-<td>R</td>
-<td>2017</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
-<td>2016-2017</td>
-<td>Jordan Kyrou</td>
-<td>66</td>
-<td>30</td>
-<td>64</td>
-<td>94</td>
-<td>1998-05-05</td>
-<td>185</td>
-<td>89 kg / 196 lbs</td>
-<td>R</td>
-<td>2017</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
-<td>2016-2017</td>
-<td>Ryan Moore</td>
-<td>68</td>
-<td>39</td>
-<td>51</td>
-<td>90</td>
-<td>1997-04-09</td>
-<td>175</td>
-<td>76 kg / 168 lbs</td>
-<td>L</td>
-<td>2017</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
-<td>2016-2017</td>
-<td>Cliff Pu</td>
-<td>63</td>
-<td>35</td>
-<td>51</td>
-<td>86</td>
-<td>1998-06-03</td>
-<td>188</td>
-<td>84 kg / 185 lbs</td>
-<td>R</td>
-<td>2017</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>2016-2017</td>
-<td>Kole Sherwood</td>
-<td>60</td>
-<td>33</td>
-<td>52</td>
-<td>85</td>
-<td>1997-01-22</td>
-<td>185</td>
-<td>96 kg / 212 lbs</td>
-<td>R</td>
-<td>2017</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>2016-2017</td>
-<td>Kevin Hancock</td>
-<td>68</td>
-<td>30</td>
-<td>55</td>
-<td>85</td>
-<td>1998-03-02</td>
-<td>180</td>
-<td>82 kg / 181 lbs</td>
-<td>L</td>
-<td>2017</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>2013-2014</td>
-<td>Connor Brown</td>
-<td>68</td>
-<td>45</td>
-<td>83</td>
-<td>128</td>
-<td>1994-01-14</td>
-<td>183</td>
-<td>83 kg / 183 lbs</td>
-<td>R</td>
-<td>2014</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2013-2014</td>
-<td>Dane Fox</td>
-<td>67</td>
-<td>64</td>
-<td>43</td>
-<td>107</td>
-<td>1993-10-13</td>
-<td>184</td>
-<td>84 kg / 185 lbs</td>
-<td>L</td>
-<td>2014</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2013-2014</td>
-<td>Scott Kosmachuk</td>
-<td>68</td>
-<td>49</td>
-<td>52</td>
-<td>101</td>
-<td>1994-01-24</td>
-<td>180</td>
-<td>84 kg / 185 lbs</td>
-<td>R</td>
-<td>2014</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>2013-2014</td>
-<td>Connor McDavid</td>
-<td>56</td>
-<td>28</td>
-<td>71</td>
-<td>99</td>
-<td>1997-01-13</td>
-<td>185</td>
-<td>88 kg / 194 lbs</td>
-<td>L</td>
-<td>2014</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2013-2014</td>
-<td>Andreas Athanasiou</td>
-<td>66</td>
-<td>49</td>
-<td>46</td>
-<td>95</td>
-<td>1994-08-06</td>
-<td>188</td>
-<td>86 kg / 190 lbs</td>
-<td>L</td>
-<td>2014</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
-<td>2013-2014</td>
-<td>Michael Dal Colle</td>
-<td>67</td>
-<td>39</td>
-<td>56</td>
-<td>95</td>
-<td>1996-06-20</td>
-<td>191</td>
-<td>88 kg / 194 lbs</td>
-<td>L</td>
-<td>2014</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
-<td>2013-2014</td>
-<td>Nikolai Goldobin</td>
-<td>67</td>
-<td>38</td>
-<td>56</td>
-<td>94</td>
-<td>1995-10-07</td>
-<td>183</td>
-<td>82 kg / 181 lbs</td>
-<td>L</td>
-<td>2014</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
-<td>2013-2014</td>
-<td>Max Domi</td>
-<td>61</td>
-<td>34</td>
-<td>59</td>
-<td>93</td>
-<td>1995-03-02</td>
-<td>178</td>
-<td>95 kg / 209 lbs</td>
-<td>L</td>
-<td>2014</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>2013-2014</td>
-<td>Sam Bennett</td>
-<td>57</td>
-<td>36</td>
-<td>55</td>
-<td>91</td>
-<td>1996-06-20</td>
-<td>185</td>
-<td>88 kg / 194 lbs</td>
-<td>L</td>
-<td>2014</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>2013-2014</td>
-<td>Sergei Tolchinsky</td>
-<td>66</td>
-<td>31</td>
-<td>60</td>
-<td>91</td>
-<td>1995-02-03</td>
-<td>174</td>
-<td>74 kg / 163 lbs</td>
-<td>L</td>
-<td>2014</td>
-</tr>
-</tbody>
-</table>
-
+<div id="eadd1a6c" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting all NHL players drafted form 2005 - 2020</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> scrape <span class="op">==</span> <span class="va">True</span>:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    years <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">2005</span>, <span class="dv">2021</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    draftyears <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> year <span class="kw">in</span> years:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        df_list <span class="op">=</span> pd.read_html(<span class="ss">f"https://www.hockey-reference.com/draft/NHL_</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">_entry.html"</span>, match<span class="op">=</span><span class="st">"Round"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        players_drafted <span class="op">=</span> df_list[<span class="dv">0</span>]</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        players_drafted</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        <span class="co">#Let's get rid of the top header that isnt really used</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        players_drafted.columns <span class="op">=</span> players_drafted.columns.get_level_values(<span class="dv">1</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        players_drafted[<span class="st">"draft_year"</span>] <span class="op">=</span> year</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        players_drafted <span class="op">=</span> players_drafted[[<span class="st">"draft_year"</span>, <span class="st">"Player"</span>]]</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        players_drafted <span class="op">=</span>players_drafted.rename(columns<span class="op">=</span>{<span class="st">"draft_year"</span>: <span class="st">"player_draft_year"</span>, <span class="st">"Player"</span>: <span class="st">"player"</span>})</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        draftyears <span class="op">=</span> pd.concat([draftyears, players_drafted])</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    draftyears        </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</div>
-<div id="eadd1a6c" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting all NHL players drafted form 2005 - 2020</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">2005</span>, <span class="dv">2021</span>))</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>draftyears <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> years:</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    df_list <span class="op">=</span> pd.read_html(<span class="ss">f"https://www.hockey-reference.com/draft/NHL_</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">_entry.html"</span>, match<span class="op">=</span><span class="st">"Round"</span>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    players_drafted <span class="op">=</span> df_list[<span class="dv">0</span>]</span>
+<div id="d9e64ab9" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting games played for all NHL players</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> scrape <span class="op">==</span> <span class="va">True</span>:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    nhl_gp <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    pages <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">80</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> page <span class="kw">in</span> pages:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        df_list <span class="op">=</span> pd.read_html(<span class="ss">f"https://www.eliteprospects.com/league/nhl/stats/all-time?page=</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        page_stats <span class="op">=</span> df_list[<span class="dv">2</span>]</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        page_stats <span class="op">=</span> page_stats[[<span class="st">"Player"</span>, <span class="st">"GP"</span>]]</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        nhl_gp <span class="op">=</span> pd.concat([nhl_gp, page_stats])</span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    players_drafted</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    nhl_gp <span class="op">=</span> nhl_gp.rename(columns<span class="op">=</span>{<span class="st">"Player"</span>: <span class="st">"player"</span>, <span class="st">"GP"</span>: <span class="st">"nhl_gp"</span>})</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Let's get rid of the top header that isnt really used</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    players_drafted.columns <span class="op">=</span> players_drafted.columns.get_level_values(<span class="dv">1</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#GET RID OF PLAYER POSITIONS FROM NAMES</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    nhl_gp[<span class="st">'player'</span>] <span class="op">=</span> nhl_gp[<span class="st">'player'</span>].<span class="bu">str</span>.replace(<span class="vs">r'</span><span class="dv">\s</span><span class="op">*</span><span class="ch">\(</span><span class="pp">[^)]</span><span class="op">*</span><span class="ch">\)</span><span class="vs">'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    players_drafted[<span class="st">"draft_year"</span>] <span class="op">=</span> year</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    players_drafted <span class="op">=</span> players_drafted[[<span class="st">"draft_year"</span>, <span class="st">"Player"</span>]]</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    players_drafted <span class="op">=</span>players_drafted.rename(columns<span class="op">=</span>{<span class="st">"draft_year"</span>: <span class="st">"player_draft_year"</span>, <span class="st">"Player"</span>: <span class="st">"player"</span>})</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    draftyears <span class="op">=</span> pd.concat([draftyears, players_drafted])</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>draftyears        </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="36">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">player_draft_year</th>
-<th data-quarto-table-cell-role="th">player</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>2005</td>
-<td>Sidney Crosby</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2005</td>
-<td>Bobby Ryan</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2005</td>
-<td>Jack Johnson</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>2005</td>
-<td>Benoit Pouliot</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2005</td>
-<td>Carey Price</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">223</td>
-<td>2020</td>
-<td>Ryan Tverberg</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">224</td>
-<td>2020</td>
-<td>Henrik Tikkanen</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">225</td>
-<td>2020</td>
-<td>Maxim Marushev</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">226</td>
-<td>2020</td>
-<td>Jakub Konecny</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">227</td>
-<td>2020</td>
-<td>Declan McDonnell</td>
-</tr>
-</tbody>
-</table>
-
-<p>3609 rows × 2 columns</p>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Replacing NA and "-" values with 0</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    nhl_gp[<span class="st">"nhl_gp"</span>] <span class="op">=</span> nhl_gp[<span class="st">"nhl_gp"</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    nhl_gp[<span class="st">"nhl_gp"</span>] <span class="op">=</span> nhl_gp[<span class="st">"nhl_gp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    nhl_gp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</div>
-<div id="d9e64ab9" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting games played for all NHL players</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>nhl_gp <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>pages <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">80</span>))</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> page <span class="kw">in</span> pages:</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    df_list <span class="op">=</span> pd.read_html(<span class="ss">f"https://www.eliteprospects.com/league/nhl/stats/all-time?page=</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    page_stats <span class="op">=</span> df_list[<span class="dv">2</span>]</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    page_stats <span class="op">=</span> page_stats[[<span class="st">"Player"</span>, <span class="st">"GP"</span>]]</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    nhl_gp <span class="op">=</span> pd.concat([nhl_gp, page_stats])</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>nhl_gp <span class="op">=</span> nhl_gp.rename(columns<span class="op">=</span>{<span class="st">"Player"</span>: <span class="st">"player"</span>, <span class="st">"GP"</span>: <span class="st">"nhl_gp"</span>})</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#GET RID OF PLAYER POSITIONS FROM NAMES</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>nhl_gp[<span class="st">'player'</span>] <span class="op">=</span> nhl_gp[<span class="st">'player'</span>].<span class="bu">str</span>.replace(<span class="vs">r'</span><span class="dv">\s</span><span class="op">*</span><span class="ch">\(</span><span class="pp">[^)]</span><span class="op">*</span><span class="ch">\)</span><span class="vs">'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Replacing NA and "-" values with 0</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>nhl_gp[<span class="st">"nhl_gp"</span>] <span class="op">=</span> nhl_gp[<span class="st">"nhl_gp"</span>].fillna(<span class="dv">0</span>)</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>nhl_gp[<span class="st">"nhl_gp"</span>] <span class="op">=</span> nhl_gp[<span class="st">"nhl_gp"</span>].replace(<span class="st">"-"</span>, <span class="dv">0</span>)</span>
+<div id="9329ed8d" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Join GP, draft year onto OHL player data</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> scrape <span class="op">==</span> <span class="va">True</span>:</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">#MAKE ALL PLAYER NAMES UPPERCASE (TO MAKE JOINING TABLES NON CASE SENSITIVE)</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    aggregated_output[<span class="st">'player'</span>] <span class="op">=</span> aggregated_output[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    draftyears[<span class="st">'player'</span>] <span class="op">=</span> draftyears[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    nhl_gp[<span class="st">'player'</span>] <span class="op">=</span> nhl_gp[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Filter ohl stats for only drafted players' draft year stats - </span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">#This will get rid of a) undrafted players, and b) drafted players non-draft year stats</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.merge(aggregated_output, draftyears, left_on<span class="op">=</span>[<span class="st">'player'</span>, <span class="st">'draft_year'</span>], right_on<span class="op">=</span>[<span class="st">'player'</span>, <span class="st">'player_draft_year'</span>], how<span class="op">=</span><span class="st">'inner'</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Can get rid of one of the draft year columns - don't need both</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df[[<span class="st">"year"</span>, <span class="st">"player"</span>, <span class="st">"gp"</span>, <span class="st">"g"</span>, <span class="st">"a"</span>, <span class="st">"tp"</span>, <span class="st">"dob"</span>, <span class="st">"height"</span>, <span class="st">"weight"</span>, <span class="st">"shoots"</span>, <span class="st">'draft_year'</span>]]</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Join players' games played - if player gp not found, assume it to be 0.</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.merge(df, nhl_gp, left_on<span class="op">=</span>[<span class="st">'player'</span>], right_on<span class="op">=</span>[<span class="st">'player'</span>], how<span class="op">=</span><span class="st">'left'</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"nhl_gp"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"nhl_gp"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>].astype(<span class="bu">int</span>)</span>
 <span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>nhl_gp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="37">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">player</th>
-<th data-quarto-table-cell-role="th">nhl_gp</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>Wayne Gretzky</td>
-<td>1487.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>Jaromír Jágr</td>
-<td>1733.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>Mark Messier</td>
-<td>1756.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>Gordie Howe</td>
-<td>1767.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>Ron Francis</td>
-<td>1731.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20</td>
-<td>Isaac Howard</td>
-<td>0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">21</td>
-<td>NaN</td>
-<td>0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">22</td>
-<td>Daniil But</td>
-<td>0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">23</td>
-<td>Arseni Gritsyuk</td>
-<td>0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">24</td>
-<td>David Tomasek</td>
-<td>0</td>
-</tr>
-</tbody>
-</table>
-
-<p>8527 rows × 2 columns</p>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    df.to_excel(filename, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</div>
-<div id="9329ed8d" class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Join GP, draft year onto OHL player data</span></span>
+<div id="6cce681e" class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SOME DATA CLEANING</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#MAKE ALL PLAYER NAMES UPPERCASE (TO MAKE JOINING TABLES NON CASE SENSITIVE)</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>aggregated_output[<span class="st">'player'</span>] <span class="op">=</span> aggregated_output[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>draftyears[<span class="st">'player'</span>] <span class="op">=</span> draftyears[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>nhl_gp[<span class="st">'player'</span>] <span class="op">=</span> nhl_gp[<span class="st">'player'</span>].<span class="bu">str</span>.upper()</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Filter ohl stats for only drafted players' draft year stats - </span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#This will get rid of a) undrafted players, and b) drafted players non-draft year stats</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.merge(aggregated_output, draftyears, left_on<span class="op">=</span>[<span class="st">'player'</span>, <span class="st">'draft_year'</span>], right_on<span class="op">=</span>[<span class="st">'player'</span>, <span class="st">'player_draft_year'</span>], how<span class="op">=</span><span class="st">'inner'</span>)</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#Can get rid of one of the draft year columns - don't need both</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">"year"</span>, <span class="st">"player"</span>, <span class="st">"gp"</span>, <span class="st">"g"</span>, <span class="st">"a"</span>, <span class="st">"tp"</span>, <span class="st">"dob"</span>, <span class="st">"height"</span>, <span class="st">"weight"</span>, <span class="st">"shoots"</span>, <span class="st">'draft_year'</span>]]</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#Join players' games played - if player gp not found, assume it to be 0.</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.merge(df, nhl_gp, left_on<span class="op">=</span>[<span class="st">'player'</span>], right_on<span class="op">=</span>[<span class="st">'player'</span>], how<span class="op">=</span><span class="st">'left'</span>)</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"nhl_gp"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>].fillna(<span class="dv">0</span>)</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"nhl_gp"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_excel(filename)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Changing the weight to a numerical variate in kg</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"weight_kg"</span>] <span class="op">=</span> df[<span class="st">"weight"</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: x[:x.find(<span class="st">" "</span>)])</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"weight_kg"</span>] <span class="op">=</span> df[<span class="st">"weight_kg"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>df.dtypes</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting the age of the player at the time of draft (for simplicity, we will assume draft to be on June 30 for all years)</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"draft_date"</span>] <span class="op">=</span> df[<span class="st">"draft_year"</span>].astype(<span class="bu">str</span>) <span class="op">+</span> <span class="st">'-06-30'</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"draft_date"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"draft_date"</span>])</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"dob"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"dob"</span>])</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"age_days"</span>] <span class="op">=</span> (df[<span class="st">"draft_date"</span>] <span class="op">-</span> df[<span class="st">"dob"</span>])</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"age_days"</span>] <span class="op">=</span> df[<span class="st">"age_days"</span>].dt.days</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#Can get rid of intermediate columns</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop([<span class="st">"dob"</span>, <span class="st">"weight"</span>, <span class="st">"draft_year"</span>, <span class="st">"draft_date"</span>], axis <span class="op">=</span> <span class="dv">1</span>)</span>
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"regression_input.xlsx"</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>df.to_excel(filename, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="6cce681e" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SOME DATA CLEANING</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_excel(filename)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Changing the weight to a numerical variate in kg</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"weight_kg"</span>] <span class="op">=</span> df[<span class="st">"weight"</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: x[:x.find(<span class="st">" "</span>)])</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"weight_kg"</span>] <span class="op">=</span> df[<span class="st">"weight_kg"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>df.dtypes</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting the age of the player at the time of draft (for simplicity, we will assume draft to be on June 30 for all years)</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"draft_date"</span>] <span class="op">=</span> df[<span class="st">"draft_year"</span>].astype(<span class="bu">str</span>) <span class="op">+</span> <span class="st">'-06-30'</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"draft_date"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"draft_date"</span>])</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"dob"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"dob"</span>])</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"age_days"</span>] <span class="op">=</span> (df[<span class="st">"draft_date"</span>] <span class="op">-</span> df[<span class="st">"dob"</span>])</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"age_days"</span>] <span class="op">=</span> df[<span class="st">"age_days"</span>].dt.days</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#Can get rid of intermediate columns</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop([<span class="st">"dob"</span>, <span class="st">"weight"</span>, <span class="st">"draft_year"</span>, <span class="st">"draft_date"</span>], axis <span class="op">=</span> <span class="dv">1</span>)</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Adding columns for goals/g and points/g</span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"gpg"</span>] <span class="op">=</span> df[<span class="st">"g"</span>] <span class="op">/</span> df[<span class="st">"gp"</span>]</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"ppg"</span>] <span class="op">=</span> df[<span class="st">"tp"</span>] <span class="op">/</span> df[<span class="st">"gp"</span>]</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">#Create indicator variable to measure if the player has played at least 200 nhl games</span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>] <span class="op">&gt;=</span> <span class="dv">200</span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Pr[GP &gt; 200]"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co">#Renaming height column to height_cm for clarity</span></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.rename(columns <span class="op">=</span> {<span class="st">"height"</span>: <span class="st">"height_cm"</span>})</span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="39">
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Adding columns for goals/g and points/g</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"gpg"</span>] <span class="op">=</span> df[<span class="st">"g"</span>] <span class="op">/</span> df[<span class="st">"gp"</span>]</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"ppg"</span>] <span class="op">=</span> df[<span class="st">"tp"</span>] <span class="op">/</span> df[<span class="st">"gp"</span>]</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co">#Create indicator variable to measure if the player has played at least 200 nhl games</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">=</span> df[<span class="st">"nhl_gp"</span>] <span class="op">&gt;=</span> <span class="dv">200</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Pr[GP &gt; 200]"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="co">#Renaming height column to height_cm for clarity</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.rename(columns <span class="op">=</span> {<span class="st">"height"</span>: <span class="st">"height_cm"</span>})</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
 <div>
 
 
@@ -809,143 +310,252 @@ Your scrape is complete! You've obtained player information for 10 players!</cod
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>2016-2017</td>
-<td>PETRUS PALMU</td>
-<td>62</td>
-<td>40</td>
+<td>2006-2007</td>
+<td>PATRICK KANE</td>
 <td>58</td>
-<td>98</td>
-<td>168</td>
+<td>62</td>
+<td>83</td>
+<td>145</td>
+<td>178</td>
 <td>L</td>
-<td>0</td>
-<td>78</td>
-<td>7289</td>
-<td>0.645161</td>
-<td>1.580645</td>
-<td>False</td>
+<td>1302</td>
+<td>80</td>
+<td>6797</td>
+<td>1.068966</td>
+<td>2.500000</td>
+<td>True</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>2016-2017</td>
-<td>NICK SUZUKI</td>
-<td>65</td>
-<td>45</td>
-<td>51</td>
-<td>96</td>
+<td>2006-2007</td>
+<td>SAM GAGNER</td>
+<td>53</td>
+<td>35</td>
+<td>83</td>
+<td>118</td>
 <td>180</td>
 <td>R</td>
-<td>455</td>
-<td>94</td>
-<td>6534</td>
-<td>0.692308</td>
-<td>1.476923</td>
+<td>1043</td>
+<td>89</td>
+<td>6533</td>
+<td>0.660377</td>
+<td>2.226415</td>
 <td>True</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>2013-2014</td>
-<td>MICHAEL DAL COLLE</td>
-<td>67</td>
+<td>2006-2007</td>
+<td>BRETT MACLEAN</td>
+<td>68</td>
+<td>47</td>
+<td>53</td>
+<td>100</td>
+<td>188</td>
+<td>R</td>
+<td>18</td>
+<td>89</td>
+<td>6762</td>
+<td>0.691176</td>
+<td>1.470588</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2006-2007</td>
+<td>STEFAN LEGEIN</td>
+<td>64</td>
+<td>43</td>
+<td>32</td>
+<td>75</td>
+<td>178</td>
+<td>R</td>
+<td>0</td>
+<td>77</td>
+<td>6792</td>
+<td>0.671875</td>
+<td>1.171875</td>
+<td>False</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2006-2007</td>
+<td>ZACK TORQUATO</td>
+<td>65</td>
+<td>30</td>
 <td>39</td>
-<td>56</td>
-<td>95</td>
-<td>191</td>
-<td>L</td>
-<td>112</td>
+<td>69</td>
+<td>183</td>
+<td>R</td>
+<td>0</td>
 <td>88</td>
-<td>6584</td>
-<td>0.582090</td>
-<td>1.417910</td>
+<td>6596</td>
+<td>0.461538</td>
+<td>1.061538</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">283</td>
+<td>2019-2020</td>
+<td>DECLAN MCDONNELL</td>
+<td>63</td>
+<td>21</td>
+<td>21</td>
+<td>42</td>
+<td>178</td>
+<td>R</td>
+<td>0</td>
+<td>86</td>
+<td>6700</td>
+<td>0.333333</td>
+<td>0.666667</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">284</td>
+<td>2019-2020</td>
+<td>ANTONIO STRANGES</td>
+<td>61</td>
+<td>19</td>
+<td>21</td>
+<td>40</td>
+<td>180</td>
+<td>L</td>
+<td>0</td>
+<td>84</td>
+<td>6720</td>
+<td>0.311475</td>
+<td>0.655738</td>
+<td>False</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">285</td>
+<td>2019-2020</td>
+<td>TANNER DICKINSON</td>
+<td>64</td>
+<td>9</td>
+<td>31</td>
+<td>40</td>
+<td>183</td>
+<td>L</td>
+<td>0</td>
+<td>80</td>
+<td>6692</td>
+<td>0.140625</td>
+<td>0.625000</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">286</td>
+<td>2019-2020</td>
+<td>MARTIN CHROMIAK</td>
+<td>28</td>
+<td>11</td>
+<td>22</td>
+<td>33</td>
+<td>183</td>
+<td>R</td>
+<td>0</td>
+<td>86</td>
+<td>6524</td>
+<td>0.392857</td>
+<td>1.178571</td>
+<td>False</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">287</td>
+<td>2019-2020</td>
+<td>JAN MYSAK</td>
+<td>22</td>
+<td>15</td>
+<td>10</td>
+<td>25</td>
+<td>180</td>
+<td>L</td>
+<td>0</td>
+<td>86</td>
+<td>6581</td>
+<td>0.681818</td>
+<td>1.136364</td>
 <td>False</td>
 </tr>
 </tbody>
 </table>
 
+<p>288 rows × 14 columns</p>
 </div>
 </div>
 </div>
-<div id="4c32458d" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># X: predictors, y: binary response</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_regress <span class="op">=</span> df[df[<span class="st">"year"</span>].isin([<span class="st">"2004-2005"</span>, <span class="st">"2006-2007"</span>, <span class="st">"2007-2008"</span>, <span class="st">"2008-2009"</span>, <span class="st">"2009-2010"</span>, </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"2014-2015"</span>, <span class="st">"2015-2016"</span>, <span class="st">"2016-2017"</span>, <span class="st">"2017-2018"</span>, <span class="st">"2018-2019"</span>])]</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df_regress[[<span class="st">'g'</span>, <span class="st">'a'</span>, <span class="st">'tp'</span>, <span class="st">'height_cm'</span>, <span class="st">'weight_kg'</span>, <span class="st">'age_days'</span>, <span class="st">'gpg'</span>, <span class="st">'ppg'</span>]]</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(X)  <span class="co"># adds intercept</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df_regress[<span class="st">'Pr[GP &gt; 200]'</span>]</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.Logit(y, X)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> model.fit()</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="4c32458d" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># X: predictors, y: binary response</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>df_regress <span class="op">=</span> df[df[<span class="st">"year"</span>].isin([<span class="st">"2004-2005"</span>, <span class="st">"2006-2007"</span>, <span class="st">"2007-2008"</span>, <span class="st">"2008-2009"</span>, <span class="st">"2009-2010"</span>, </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"2014-2015"</span>, <span class="st">"2015-2016"</span>, <span class="st">"2016-2017"</span>, <span class="st">"2017-2018"</span>, <span class="st">"2018-2019"</span>])]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df_regress[[<span class="st">'g'</span>, <span class="st">'a'</span>, <span class="st">'tp'</span>, <span class="st">'height_cm'</span>, <span class="st">'weight_kg'</span>, <span class="st">'age_days'</span>, <span class="st">'gpg'</span>, <span class="st">'ppg'</span>]]</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(X)  <span class="co"># adds intercept</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df_regress[<span class="st">'Pr[GP &gt; 200]'</span>]</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.Logit(y, X)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> model.fit()</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Warning: Maximum number of iterations has been exceeded.
-         Current function value: 0.000475
+         Current function value: 0.488150
          Iterations: 35
                            Logit Regression Results                           
 ==============================================================================
-Dep. Variable:           Pr[GP &gt; 200]   No. Observations:                    2
-Model:                          Logit   Df Residuals:                        0
-Method:                           MLE   Df Model:                            1
-Date:                Fri, 01 Aug 2025   Pseudo R-squ.:                  0.9993
-Time:                        20:41:14   Log-Likelihood:            -0.00095050
-converged:                      False   LL-Null:                       -1.3863
-Covariance Type:            nonrobust   LLR p-value:                   0.09600
+Dep. Variable:           Pr[GP &gt; 200]   No. Observations:                  167
+Model:                          Logit   Df Residuals:                      158
+Method:                           MLE   Df Model:                            8
+Date:                Sun, 03 Aug 2025   Pseudo R-squ.:                  0.2244
+Time:                        17:04:52   Log-Likelihood:                -81.521
+converged:                      False   LL-Null:                       -105.11
+Covariance Type:            nonrobust   LLR p-value:                 1.424e-07
 ==============================================================================
                  coef    std err          z      P&gt;|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const          0.0009   1.16e+09   8.19e-13      1.000   -2.27e+09    2.27e+09
-g              0.0834        nan        nan        nan         nan         nan
-a             -0.0090          0       -inf      0.000      -0.009      -0.009
-tp             0.0744        nan        nan        nan         nan         nan
-height_cm      0.2695   2.15e+07   1.25e-08      1.000   -4.22e+07    4.22e+07
-weight_kg      0.2204         -0       -inf      0.000       0.220       0.220
-age_days      -0.0110        nan        nan        nan         nan         nan
-gpg            0.0011        nan        nan        nan         nan         nan
-ppg            0.0005        nan        nan        nan         nan         nan
+const         -0.7392     10.224     -0.072      0.942     -20.778      19.299
+g             -0.0991        nan        nan        nan         nan         nan
+a              0.0749        nan        nan        nan         nan         nan
+tp            -0.0238        nan        nan        nan         nan         nan
+height_cm      0.0524      0.047      1.109      0.267      -0.040       0.145
+weight_kg      0.0318      0.040      0.801      0.423      -0.046       0.110
+age_days      -0.0023      0.001     -2.140      0.032      -0.004      -0.000
+gpg            7.3258     22.332      0.328      0.743     -36.444      51.095
+ppg            1.4341      9.650      0.149      0.882     -17.480      20.349
 ==============================================================================</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/discrete/discrete_model.py:227: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified
-  warnings.warn(msg, category=PerfectSeparationWarning)
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/statsmodels/base/model.py:607: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
+<pre><code>/Users/devakshah/Downloads/STAT468/STAT468 Final/venv/lib/python3.13/site-packages/statsmodels/base/model.py:607: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
   warnings.warn("Maximum Likelihood optimization failed to "</code></pre>
 </div>
 </div>
-<div id="9d59b91c" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Testing model out</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> df[df[<span class="st">"year"</span>].isin([<span class="st">"2010-2011"</span>, <span class="st">"2011-2012"</span>, <span class="st">"2012-2013"</span>, <span class="st">"2013-2014"</span>])]</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df_test[[<span class="st">'g'</span>, <span class="st">'a'</span>, <span class="st">'tp'</span>, <span class="st">'height_cm'</span>, <span class="st">'weight_kg'</span>, <span class="st">'age_days'</span>, <span class="st">'gpg'</span>, <span class="st">'ppg'</span>]]</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(X, has_constant<span class="op">=</span><span class="st">'add'</span>)  <span class="co"># adds intercept</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#If regression yields a probability greater than or equal to 0.5, we will say it predicts the player will become a full-time NHL player</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"pred_prob"</span>] <span class="op">=</span> result.predict(X) <span class="op">&gt;=</span> <span class="fl">0.5</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>df_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="41">
+<div id="9d59b91c" class="cell" data-execution_count="60">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Testing model out</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> df[df[<span class="st">"year"</span>].isin([<span class="st">"2010-2011"</span>, <span class="st">"2011-2012"</span>, <span class="st">"2012-2013"</span>, <span class="st">"2013-2014"</span>])]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df_test[[<span class="st">'g'</span>, <span class="st">'a'</span>, <span class="st">'tp'</span>, <span class="st">'height_cm'</span>, <span class="st">'weight_kg'</span>, <span class="st">'age_days'</span>, <span class="st">'gpg'</span>, <span class="st">'ppg'</span>]]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(X, has_constant<span class="op">=</span><span class="st">'add'</span>)  <span class="co"># adds intercept</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#If regression yields a probability greater than or equal to 0.5, we will say it predicts the player will become a full-time NHL player</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"pred_prob"</span>] <span class="op">=</span> result.predict(X) <span class="op">&gt;=</span> <span class="fl">0.5</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>df_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="60">
 <div>
 
 
@@ -972,58 +582,296 @@ ppg            0.0005        nan        nan        nan         nan         nan
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2013-2014</td>
-<td>MICHAEL DAL COLLE</td>
-<td>67</td>
-<td>39</td>
-<td>56</td>
-<td>95</td>
-<td>191</td>
-<td>L</td>
-<td>112</td>
+<td data-quarto-table-cell-role="th">72</td>
+<td>2010-2011</td>
+<td>RYAN STROME</td>
+<td>65</td>
+<td>33</td>
+<td>73</td>
+<td>106</td>
+<td>185</td>
+<td>R</td>
+<td>864</td>
+<td>87</td>
+<td>6563</td>
+<td>0.507692</td>
+<td>1.630769</td>
+<td>True</td>
+<td>True</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">73</td>
+<td>2010-2011</td>
+<td>SHANE PRINCE</td>
+<td>59</td>
+<td>25</td>
+<td>63</td>
 <td>88</td>
-<td>6584</td>
-<td>0.58209</td>
-<td>1.41791</td>
+<td>181</td>
+<td>L</td>
+<td>128</td>
+<td>88</td>
+<td>6800</td>
+<td>0.423729</td>
+<td>1.491525</td>
 <td>False</td>
 <td>True</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">74</td>
+<td>2010-2011</td>
+<td>STEFAN NOESEN</td>
+<td>68</td>
+<td>34</td>
+<td>43</td>
+<td>77</td>
+<td>185</td>
+<td>R</td>
+<td>444</td>
+<td>93</td>
+<td>6712</td>
+<td>0.500000</td>
+<td>1.132353</td>
+<td>True</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">75</td>
+<td>2010-2011</td>
+<td>ANDY ANDREOFF</td>
+<td>66</td>
+<td>33</td>
+<td>42</td>
+<td>75</td>
+<td>185</td>
+<td>L</td>
+<td>188</td>
+<td>95</td>
+<td>7349</td>
+<td>0.500000</td>
+<td>1.136364</td>
+<td>False</td>
+<td>False</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">76</td>
+<td>2010-2011</td>
+<td>MARK SCHEIFELE</td>
+<td>66</td>
+<td>22</td>
+<td>53</td>
+<td>75</td>
+<td>190</td>
+<td>R</td>
+<td>879</td>
+<td>94</td>
+<td>6681</td>
+<td>0.333333</td>
+<td>1.136364</td>
+<td>True</td>
+<td>True</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">168</td>
+<td>2013-2014</td>
+<td>CRISTIANO DIGIACINTO</td>
+<td>50</td>
+<td>17</td>
+<td>11</td>
+<td>28</td>
+<td>183</td>
+<td>L</td>
+<td>0</td>
+<td>88</td>
+<td>6746</td>
+<td>0.340000</td>
+<td>0.560000</td>
+<td>False</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">169</td>
+<td>2013-2014</td>
+<td>JAKE EVANS</td>
+<td>57</td>
+<td>11</td>
+<td>7</td>
+<td>18</td>
+<td>183</td>
+<td>L</td>
+<td>350</td>
+<td>89</td>
+<td>7072</td>
+<td>0.192982</td>
+<td>0.315789</td>
+<td>True</td>
+<td>False</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">170</td>
+<td>2013-2014</td>
+<td>JADEN LINDO</td>
+<td>40</td>
+<td>9</td>
+<td>9</td>
+<td>18</td>
+<td>188</td>
+<td>R</td>
+<td>0</td>
+<td>97</td>
+<td>6745</td>
+<td>0.225000</td>
+<td>0.450000</td>
+<td>False</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">171</td>
+<td>2013-2014</td>
+<td>CHRISTIAN DVORAK</td>
+<td>33</td>
+<td>6</td>
+<td>8</td>
+<td>14</td>
+<td>185</td>
+<td>L</td>
+<td>534</td>
+<td>91</td>
+<td>6723</td>
+<td>0.181818</td>
+<td>0.424242</td>
+<td>True</td>
+<td>False</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">172</td>
+<td>2013-2014</td>
+<td>KYLE PETTIT</td>
+<td>53</td>
+<td>5</td>
+<td>5</td>
+<td>10</td>
+<td>193</td>
+<td>L</td>
+<td>0</td>
+<td>91</td>
+<td>6737</td>
+<td>0.094340</td>
+<td>0.188679</td>
+<td>False</td>
+<td>False</td>
 </tr>
 </tbody>
 </table>
 
+<p>101 rows × 15 columns</p>
 </div>
 </div>
 </div>
-<div id="bac83b07" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>TP <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">True</span>)].shape[<span class="dv">0</span>]</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"True Positive: </span><span class="sc">{</span>TP<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>TN <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">False</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">False</span>)].shape[<span class="dv">0</span>]</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"True Negative: </span><span class="sc">{</span>TN<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>FP <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">False</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">True</span>)].shape[<span class="dv">0</span>]</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"False Positive: </span><span class="sc">{</span>FP<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>FN <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">False</span>)].shape[<span class="dv">0</span>]</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"False Negative: </span><span class="sc">{</span>FN<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>success_rate <span class="op">=</span> (TP <span class="op">+</span> TN) <span class="op">/</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN) <span class="cf">if</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Success Rate: </span><span class="sc">{</span>success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>positive_success_rate <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FP) <span class="cf">if</span> (TP <span class="op">+</span> FP) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Positive Success Rate: </span><span class="sc">{</span>positive_success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>nhler_success_rate <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FN) <span class="cf">if</span> (TP <span class="op">+</span> FN) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NHLer Success Rate: </span><span class="sc">{</span>nhler_success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="bac83b07" class="cell" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>TP <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">True</span>)].shape[<span class="dv">0</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"True Positive: </span><span class="sc">{</span>TP<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>TN <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">False</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">False</span>)].shape[<span class="dv">0</span>]</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"True Negative: </span><span class="sc">{</span>TN<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>FP <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">False</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">True</span>)].shape[<span class="dv">0</span>]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"False Positive: </span><span class="sc">{</span>FP<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>FN <span class="op">=</span> df_test[(df_test[<span class="st">"Pr[GP &gt; 200]"</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span> (df_test[<span class="st">"pred_prob"</span>] <span class="op">==</span> <span class="va">False</span>)].shape[<span class="dv">0</span>]</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"False Negative: </span><span class="sc">{</span>FN<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>success_rate <span class="op">=</span> (TP <span class="op">+</span> TN) <span class="op">/</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN) <span class="cf">if</span> (TP <span class="op">+</span> TN <span class="op">+</span> FP <span class="op">+</span> FN) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Success Rate: </span><span class="sc">{</span>success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>positive_success_rate <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FP) <span class="cf">if</span> (TP <span class="op">+</span> FP) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Positive Success Rate: </span><span class="sc">{</span>positive_success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>nhler_success_rate <span class="op">=</span> TP <span class="op">/</span> (TP <span class="op">+</span> FN) <span class="cf">if</span> (TP <span class="op">+</span> FN) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NHLer Success Rate: </span><span class="sc">{</span>nhler_success_rate<span class="sc">:.2%}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>True Positive: 0
-True Negative: 0
-False Positive: 1
-False Negative: 0
-Success Rate: 0.00%
-Positive Success Rate: 0.00%
-NHLer Success Rate: 0.00%</code></pre>
+<pre><code>True Positive: 10
+True Negative: 59
+False Positive: 4
+False Negative: 28
+Success Rate: 68.32%
+Positive Success Rate: 71.43%
+NHLer Success Rate: 26.32%</code></pre>
+</div>
+</div>
+<div id="e6b2d9ef" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vetiver.handlers.base <span class="im">import</span> BaseHandler</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Need to create a custom handler for statsmodels Logit models, as the default handler cannot handle this type of model</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> StatsmodelsLogitHandler(BaseHandler):</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, model, prototype_data):</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(model, prototype_data)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">@staticmethod</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> model_type():</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"statsmodels_logit"</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    pip_name <span class="op">=</span> <span class="st">"statsmodels"</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> handler_predict(<span class="va">self</span>, input_data, check_prototype: <span class="bu">bool</span>):</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">        Make predictions using a fitted statsmodels Logit model.</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co">        Parameters</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co">        ----------</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co">        input_data:</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co">            New data (e.g., from API)</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="co">        check_prototype: bool</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="co">            Whether to check data shape</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co">        -------</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="co">        Prediction array from model.predict</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Add constant to match model spec</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>        input_data_const <span class="op">=</span> sm.add_constant(input_data, has_constant<span class="op">=</span><span class="st">'add'</span>)</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>        prediction <span class="op">=</span> <span class="va">self</span>.model.predict(input_data_const)</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> prediction</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="7efe03b7" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pins <span class="im">import</span> board_s3</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vetiver <span class="im">import</span> vetiver_pin_write</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vetiver <span class="im">import</span> VetiverModel</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Store the model in an S3 bucket:</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>board <span class="op">=</span> board_s3(<span class="st">"devakshah-stat468-models"</span>, allow_pickle_read<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>custom_handler <span class="op">=</span> StatsmodelsLogitHandler(result, prototype_data<span class="op">=</span>X)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>vetiver_model <span class="op">=</span> VetiverModel(custom_handler, model_name<span class="op">=</span><span class="st">"my_logit_model"</span>, description<span class="op">=</span><span class="st">"Logistic regression"</span>, handler<span class="op">=</span>custom_handler)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>vetiver_pin_write(board, vetiver_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Model Cards provide a framework for transparent, responsible reporting. 
+ Use the vetiver `.qmd` Quarto template as a place to start, 
+ with vetiver.model_card()
+Writing pin:
+Name: 'my_logit_model'
+Version: 20250804T023520Z-20dc6</code></pre>
 </div>
 </div>
 
