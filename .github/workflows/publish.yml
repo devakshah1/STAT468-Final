@@ -18,7 +18,7 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
 
       - name: Render Quarto site
-        run: quarto render final_project_report.ipynb
+        run: quarto render final_project.ipynb
 
       - name: Publish to GitHub Pages
         uses: quarto-dev/quarto-actions/publish@v2
