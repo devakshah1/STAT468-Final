@@ -1,12 +1,12 @@
 on:
   workflow_dispatch:
   push:
-    branches: main
+    branches: [main]
 
-name: Quarto Publish
+name: Quarto Render and Publish One File
 
 jobs:
-  build-deploy:
+  render-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -17,15 +17,13 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Render Quarto site
+      - name: Render final_project.ipynb
         run: quarto render final_project.ipynb
 
       - name: Publish to GitHub Pages
         uses: quarto-dev/quarto-actions/publish@v2
         with:
+          path: _site  # Quarto outputs here by default
           target: gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
