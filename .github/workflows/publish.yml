@@ -1,12 +1,12 @@
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: main
 
-name: Quarto Render and Publish One File
+name: Quarto Publish
 
 jobs:
-  render-publish:
+  build-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -17,26 +17,17 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Install Python and Jupyter
-        uses: actions/setup-python@v5
+      - name: Render Quarto site
+        run: quarto render
+
+      - name: Publish to GitHub Pages
+        uses: quarto-dev/quarto-actions/publish@v2
         with:
-          python-version: '3.10'
-          cache: pip
-
-      - run: pip install jupyter
-      - run: pip install -r requirements.txt
-
-      - name: Render final_project.ipynb
-        run: quarto render final_project.ipynb
-
-      - name: Set git identity
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-
-      - name: Publish final_project.ipynb to GitHub Pages
-        run: quarto publish gh-pages final_project.ipynb --no-prompt
+          target: gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
 
 
