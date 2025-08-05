@@ -20,10 +20,8 @@ jobs:
       - name: Render final_project.ipynb
         run: quarto render final_project.ipynb
 
-      - name: Publish to GitHub Pages
-        uses: quarto-dev/quarto-actions/publish@v2
-        with:
-          path: _site  # Quarto outputs here by default
-          target: gh-pages
+      - name: Publish final_project.ipynb to GitHub Pages
+        run: quarto publish gh-pages final_project.ipynb --no-prompt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
