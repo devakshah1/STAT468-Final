@@ -21,6 +21,7 @@ jobs:
         run: quarto render
 
       - name: Publish to GitHub Pages
+      - run: quarto render final_project.ipynb
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           target: gh-pages
