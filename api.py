@@ -19,7 +19,6 @@ class DataRequest(BaseModel):
 
 @app.get("/model_summary")
 def model_summary():
-    # Return model summary as string (or however you want to expose it)
     params_str = str(model.params)
     return {"coeficcients": params_str}
 
