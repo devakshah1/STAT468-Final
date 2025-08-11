@@ -20,8 +20,8 @@ class DataRequest(BaseModel):
 @app.get("/model_summary")
 def model_summary():
     # Return model summary as string (or however you want to expose it)
-    summary_str = str(model.summary())
-    return {"model_summary": summary_str}
+    params_str = str(model.params)
+    return {"coeficcients": params_str}
 
 @app.post("/predict")
 def predict(req: DataRequest) -> List[dict]:
