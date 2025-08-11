@@ -32,7 +32,7 @@ else:
     missing = [var for var in ["S3_REGION", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"] if var not in os.environ]
     logging.critical(f"Environment variable(s) missing: {missing}")
 
-# Vetiver API endpoints
+# Vetiver API endpoints 
 MODEL_API_URL = "http://3.137.208.59:8000/predict"
 MODEL_SUMMARY_URL = "http://3.137.208.59:8000/model_summary"
 
