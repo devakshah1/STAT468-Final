@@ -9,7 +9,6 @@ import shinyswatch
 from lets_plot import *
 LetsPlot.setup_html()
 
-# Configure the log object with debug level to capture all messages
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.DEBUG
@@ -21,7 +20,7 @@ EXPLORER_S3_URL = "s3://devakshah-stat468-models/regression_input_data/20250810T
 PROSPECTS_S3_URL = "s3://devakshah-stat468-models/prospects_2020_to_2025_data/20250810T234638Z-0844c/prospects_2020_to_2025_data.csv"
 DUCKDB_CONN = duckdb.connect()
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv()
 
 if "S3_REGION" in os.environ and "AWS_ACCESS_KEY_ID" in os.environ and "AWS_SECRET_ACCESS_KEY" in os.environ:
     DUCKDB_CONN.sql(f"SET s3_region='{os.environ['S3_REGION']}';")
@@ -32,7 +31,6 @@ else:
     missing = [var for var in ["S3_REGION", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"] if var not in os.environ]
     logging.critical(f"Environment variable(s) missing: {missing}")
 
-# Vetiver API endpoints
 MODEL_API_URL = "http://3.137.208.59:8000/predict"
 MODEL_SUMMARY_URL = "http://3.137.208.59:8000/model_summary"
 
@@ -113,16 +111,14 @@ def server(input, output, session):
 
     @reactive.Effect
     def load_data_once():
-        reactive.invalidate_later(100, session=session)  #delay to make sure app is loaded before loading data
-        if data_explorer_df().empty:
-            logging.info("Loading explorer and prospects data from S3 via DuckDB")
-            explorer_df = DUCKDB_CONN.execute(f"SELECT * FROM read_csv_auto('{EXPLORER_S3_URL}')").df()
-            model_data = DUCKDB_CONN.execute(f"SELECT * FROM read_csv_auto('{PROSPECTS_S3_URL}')").df()
-            logging.info(f"Data explorer data loaded")
-            logging.info(f"Prospects data loaded for model inputs")
-            data_explorer_df.set(explorer_df)
-            filtered.set(explorer_df)
-            model_df.set(model_data)
+        reactive.invalidate_later(100, session=session)
+        explorer_df = DUCKDB_CONN.execute(f"SELECT * FROM read_csv_auto('{EXPLORER_S3_URL}')").df()
+        model_data = DUCKDB_CONN.execute(f"SELECT * FROM read_csv_auto('{PROSPECTS_S3_URL}')").df()
+        logging.info(f"Data explorer data loaded")
+        logging.info(f"Prospects data loaded for model inputs")
+        data_explorer_df.set(explorer_df)
+        filtered.set(explorer_df)
+        model_df.set(model_data)
 
     @output
     @render.text
@@ -133,23 +129,20 @@ def server(input, output, session):
     @render.text
     def summary():
         df = data_explorer_df()
-        text = f"{len(df)} rows loaded." if not df.empty else "No data loaded yet."
+        text = f"{len(df)} rows loaded."
         return text
 
     @output
     @render.ui
     def dynamic_ui():
         df = data_explorer_df()
-        if df.empty:
-            logging.debug("Data is empty, no filters to show")
-            return ui.p("No data available to filter.")
         numeric = df.select_dtypes("number").columns.tolist()
         return [
             ui.input_select("filter_col", "Numeric column", choices=numeric),
             ui.input_numeric("threshold", "Minimum value", value=0)
         ]
 
-    @reactive.effect
+    @reactive.Effect
     @reactive.event(input.apply_btn)
     def apply_filters():
         logging.info("Apply Filters button clicked")
@@ -157,7 +150,7 @@ def server(input, output, session):
         col = input.filter_col()
         thr = input.threshold()
         logging.debug(f"Filtering data on column '{col}' with threshold {thr}")
-        filtered_df = df[df[col] >= thr] if col in df.columns else df
+        filtered_df = df[df[col] >= thr]
         filtered.set(filtered_df)
         logging.info(f"Filtered data has {len(filtered_df)} rows")
 
@@ -170,45 +163,45 @@ def server(input, output, session):
     @render.ui
     def player_dropdown():
         df = model_df()
-        if df.empty or "player" not in df.columns:
-            logging.warning("Model dataframe empty or 'player' column missing for dropdown")
-            return ui.input_select("selected_player", "Select Player", choices=[], selected=None)
         choices = sorted(df["player"].dropna().unique().tolist())
         logging.debug(f"Player dropdown choices updated: {choices[:5]}{'...' if len(choices) > 5 else ''}")
         return ui.input_select("selected_player", "Select Player", choices=choices, selected=choices[0])
 
-    @reactive.effect
+    @reactive.Effect
     @reactive.event(input.predict_btn)
-    def _():
+    def predict_player():
         logging.info("Predict button clicked")
         df = model_df()
         selected = input.selected_player()
-        if df.empty or not selected:
-            logging.warning("No player selected or model dataframe empty")
+        if not selected:
+            logging.warning("No player selected")
             predictions.set(pd.DataFrame({"message": ["No player selected for prediction."]}))
             sent_row_text.set("No player selected.")
-        else:
-            logging.info(f"Prediction requested for player: {selected}")
-            selected_df = df[df["player"] == selected]
-            if selected_df.empty:
-                logging.warning(f"Player '{selected}' not found in data")
-                predictions.set(pd.DataFrame({"message": ["Selected player not found in data."]}))
-                sent_row_text.set("Player not found.")
-            else:
-                cols_order = ['gp', 'height_cm', 'weight_kg', 'age_days', 'gpg', 'apg']
-                missing_cols = [col for col in cols_order if col not in selected_df.columns]
-                if missing_cols:
-                    logging.error(f"Missing required columns for prediction: {missing_cols}")
-                    predictions.set(pd.DataFrame({"error": ["Missing required columns for prediction."]}))
-                    sent_row_text.set("Missing required columns for prediction.")
-                    return
+            return
 
-                send_df = selected_df[cols_order].copy()
-                send_df.insert(0, 'const', 1.0)
-                logging.debug(f"Sending data for prediction:\n{send_df}")
-                sent_row_text.set(send_df.to_string(index=False))
-                preds = predict_via_api(send_df)
-                predictions.set(preds)
+        logging.info(f"Prediction requested for player: {selected}")
+        selected_df = df[df["player"] == selected]
+
+        if selected_df.empty:
+            logging.warning(f"Player '{selected}' not found in data")
+            predictions.set(pd.DataFrame({"message": ["Selected player not found in data."]}))
+            sent_row_text.set("Player not found.")
+            return
+
+        cols_order = ['gp', 'height_cm', 'weight_kg', 'age_days', 'gpg', 'apg']
+        missing_cols = [col for col in cols_order if col not in selected_df.columns]
+        if missing_cols:
+            logging.error(f"Missing required columns for prediction: {missing_cols}")
+            predictions.set(pd.DataFrame({"error": ["Missing required columns for prediction."]}))
+            sent_row_text.set("Missing required columns for prediction.")
+            return
+
+        send_df = selected_df[cols_order].copy()
+        send_df.insert(0, 'const', 1.0)
+        logging.debug(f"Sending data for prediction:\n{send_df}")
+        sent_row_text.set(send_df.to_string(index=False))
+        preds = predict_via_api(send_df)
+        predictions.set(preds)
 
     @output
     @render.table
