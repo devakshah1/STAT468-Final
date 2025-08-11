@@ -1,0 +1,12 @@
+{
+    "https://api.shinyapps.io": {
+        "server_url": "https://api.shinyapps.io",
+        "filename": "/Users/devakshah/Downloads/STAT468/STAT468 Final",
+        "app_url": "https://devak-stat468-project.shinyapps.io/ohl_prospect_evaluator/",
+        "app_id": "15170578",
+        "app_guid": null,
+        "title": "ohl_prospect_evaluator",
+        "app_mode": "python-shiny",
+        "app_store_version": 1
+    }
+}
