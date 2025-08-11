@@ -20,3 +20,4 @@ STAT468-backup.git/hooks/update.sample
 STAT468-backup.git/info/exclude
 STAT468-backup.git/objects/pack/pack-2e7b1bae84f1ae4c10b40694930aadaf2b3c8245.idx
 STAT468-backup.git/objects/pack/pack-2e7b1bae84f1ae4c10b40694930aadaf2b3c8245.pack
+__pycache__/app.cpython-313.pyc
